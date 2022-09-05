@@ -8,6 +8,7 @@ train_pipeline = [
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
     dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
+    #TODO: adding data augment
     dict(type='SegRescale', scale_factor=1 / 4),
     dict(
         type='PhotoMetricDistortion',
@@ -34,6 +35,7 @@ test_pipeline = [
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
             dict(type='Normalize', **img_norm_cfg),
+            #TODO: adding data augment
             dict(type='SegRescale', scale_factor=1 / 4),
             dict(
                 type='PhotoMetricDistortion',
@@ -53,7 +55,6 @@ test_pipeline = [
 data = dict(
     samples_per_gpu=2,
     workers_per_gpu=2,
-    # classes=['eca_wl', 'eca_nbi', 'eca_iod', 'gca', 'gm_up', 'gm_down', 'g_ulcer'],
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/instances_train2017.json',

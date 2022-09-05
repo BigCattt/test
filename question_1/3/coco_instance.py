@@ -53,40 +53,25 @@ test_pipeline = [
 data = dict(
     samples_per_gpu=2,
     workers_per_gpu=2,
-    # classes=['eca_wl', 'eca_nbi', 'eca_iod', 'gca', 'gm_up', 'gm_down', 'g_ulcer'],
-    # train=dict(
-    #     type=dataset_type,
-    #     ann_file=data_root + 'annotations/instances_train2017.json',
-    #     img_prefix=data_root + 'train2017/',
-    #     pipeline=train_pipeline,
-    #     classes=classes),
-    # val=dict(
-    #     type=dataset_type,
-    #     ann_file=data_root + 'annotations/instances_val2017.json',
-    #     img_prefix=data_root + 'val2017/',
-    #     pipeline=test_pipeline,
-    #     #     classes=classes),
-    # test=dict(
-    #     type=dataset_type,
-    #     ann_file=data_root + 'annotations/instances_val2017.json',
-    #     img_prefix=data_root + 'val2017/',
-    #     pipeline=test_pipeline,
-    #     classes=classes
-    #     ))
+    #TODO: modify the dataset class
+    classes=['eca_wl', 'eca_nbi', 'eca_iod', 'gca', 'gm_up', 'gm_down', 'g_ulcer'],
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/instances_train2017.json',
         img_prefix=data_root + 'train2017/',
-        pipeline=train_pipeline),
+        pipeline=train_pipeline,
+        classes=classes),
     val=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/instances_val2017.json',
         img_prefix=data_root + 'val2017/',
-        pipeline=test_pipeline),
+        pipeline=test_pipeline,
+        #     classes=classes),
     test=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/instances_val2017.json',
         img_prefix=data_root + 'val2017/',
         pipeline=test_pipeline,
+        classes=classes
         ))
 evaluation = dict(metric=['bbox', 'segm'])

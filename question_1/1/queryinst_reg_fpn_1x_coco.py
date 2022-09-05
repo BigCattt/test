@@ -6,6 +6,7 @@ num_stages = 6
 num_proposals = 100
 model = dict(
     type='QueryInst',
+    # TODO:modify backbone -> RegNet
     backbone=dict(
         _delete_=True,
         type='RegNet',
@@ -19,6 +20,7 @@ model = dict(
         type='Pretrained', checkpoint='open-mmlab://regnetx_3.2gf')),
     neck=dict(
         type='FPN',
+        # TODO: modyfy the in_channels
         in_channels=[96, 192, 432, 1008],
         out_channels=256,
         start_level=0,
@@ -46,7 +48,7 @@ model = dict(
         bbox_head=[
             dict(
                 type='DIIHead',
-                num_classes=80,   #改成7个类别
+                num_classes=80,   #在问题三上，此处改成7
                 num_ffn_fcs=2,
                 num_heads=8,
                 num_cls_fcs=1,
