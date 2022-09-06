@@ -14,7 +14,7 @@ def draw_bbx(data_path):
     img_area = w * h
 
     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    canny_image = cv2.Canny(gray_image, 120, 220)  # Canny的高低阈值设置一般为2：1
+    canny_image = cv2.Canny(gray_image, 120, 220) 
 
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (11, 11))
 
@@ -24,7 +24,6 @@ def draw_bbx(data_path):
     eroded = cv2.erode(dilated, kernel)
 
     contours, hierarchy = cv2.findContours(eroded, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # print(len(contours))#打印轮廓的数量
 
     for i in range(0, len(contours)):
         max_area = -1
