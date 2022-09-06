@@ -1,73 +1,50 @@
-import cv2 as cv
+import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('TkAgg')
-import numpy as np
 import os
+import cv2
 
-# watershedSegment
-def watershedSegment(img_path):
-    # '/media/data1/xyx/dataset/medical_test_images/0b82d520572111ec877d305a3a77b88e.jpg'
-    img = cv.imread(img_path)
-    # plt.imshow(img, cmap='gray')
-    # plt.show()
+def draw_bbx(data_path):
+    img = cv2.imread(data_path)
+    img_draw = cv2.imread(data_path)
+    size = img.shape
+    w = size[1]
+    h = size[0]
+    img_area = w * h
 
-    #将图像转化为灰度图像
-    gray=cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    canny_image = cv2.Canny(gray_image, 120, 220)  # Canny的高低阈值设置一般为2：1
 
-    #阈值化处理
-    ret,thresh=cv.threshold(gray,0,255,cv.THRESH_BINARY_INV+cv.THRESH_OTSU)
-    # plt.imshow(thresh,cmap='gray')
-    # plt.show()
-
-    #noise removal
-    #opening operator是先腐蚀后膨胀，可以消除一些细小的边界，消除噪声
-    kernel=np.ones((3,3),np.uint8)
-    opening=cv.morphologyEx(thresh,cv.MORPH_OPEN,kernel,iterations=3)
-    # plt.imshow(opening,cmap='gray')
-    # plt.show()
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (11, 11))
 
 
-    # sure background area
-    sure_bg = cv.dilate(opening,kernel,iterations=1)
-    # plt.imshow(sure_bg,cmap='gray')
-    # plt.show()
+    dilated = cv2.dilate(canny_image, kernel)
 
-    # Finding sure foreground area
-    dist_transform = cv.distanceTransform(opening,cv.DIST_L2,5)
-    ret, sure_fg = cv.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+    eroded = cv2.erode(dilated, kernel)
 
-    # Finding unknown region
-    sure_fg = np.uint8(sure_fg)
-    unknown = cv.subtract(sure_bg,sure_fg)
+    contours, hierarchy = cv2.findContours(eroded, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # print(len(contours))#打印轮廓的数量
 
-    # Marker labelling
-    ret, markers = cv.connectedComponents(sure_fg)
+    for i in range(0, len(contours)):
+        max_area = -1
+        x, y, w, h = cv2.boundingRect(contours[i])  # 得出轮廓最小外接矩形左上角坐标及长、宽信息
+        if w * h < 0.9 * img_area and w * h >= 0.3 * img_area:
+            cv2.rectangle(img_draw, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        # cv2.rectangle(img_draw, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-    # Add one to all labels so that sure background is not 0, but 1
-    markers = markers+1
 
-    # Now, mark the region of unknown with zero
-    markers[unknown==255] = 0
+    return img_draw
 
-    markers = cv.watershed(img,markers)
-    img[markers == -1] = [255,0,0]
-    # plt.imshow(img,cmap='gray')
-    # plt.show()
-    return img
 
 if __name__ == "__main__":
     data_path = '/media/data1/xyx/dataset/medical_test_images/'
     filenames = os.listdir(data_path)
-    print('./inputs/test%d.jpg')
     for i, img in enumerate(filenames):
-        imgs = cv.imread(os.path.join(data_path, img))
+        imgs = cv2.imread(os.path.join(data_path, img))
         img_path = os.path.join(data_path, filenames[i])
-        res = watershedSegment(img_path)
-        # plt.imshow(res, cmap='gray')
-        # plt.show()
-        cv.imwrite('./inputs/test%d.jpg' % (i), imgs)
-        cv.imwrite('./outputs/res%d.jpg' % (i), res)
+        res = draw_bbx(img_path)
+        cv2.imwrite('./outputs/res%d.jpg' % (i), res)
 
 
 
